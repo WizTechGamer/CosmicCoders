@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cosmic Coders – Detections</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --section-bg: #0a111f;
+      --card: #121a2e;
+      --text: #e6eefc;
+      --muted: #9bb0d3;
+      --brand: #7aa2ff;
+      --brand-2: #a87bff;
+      --border: rgba(255, 255, 255, 0.12);
+      --glass: rgba(255, 255, 255, 0.06);
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Top bar */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(to bottom, rgba(5, 8, 16, .75), rgba(5, 8, 16, .35));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      width: min(1100px, 92%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 800;
+      letter-spacing: .4px;
+    }
+
+    .logo {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2), #00ffe0, var(--brand));
+      box-shadow: 0 0 20px rgba(122, 162, 255, .45), inset 0 0 10px rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .logo::before {
+      content: "C";
+      background: linear-gradient(135deg, #ffffff, #e6eefc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+
+    .nav a.btn {
+      padding: .6rem .9rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b0f1a;
+      font-weight: 800;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 88vh;
+      display: grid;
+      place-items: center;
+      padding-top: 64px;
+      overflow: hidden;
+    }
+
+    .spline-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .spline-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      filter: saturate(1.1) brightness(.95);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom,
+          rgba(11, 15, 26, 0.1) 0%,
+          rgba(11, 15, 26, 0.65) 60%,
+          rgba(11, 15, 26, 1) 95%);
+      z-index: 1;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: min(1100px, 92%);
+    }
+
+    .title {
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      line-height: 1.05;
+      margin: .4rem 0 1rem;
+      font-weight: 800;
+    }
+
+    .title .grad {
+      background: linear-gradient(90deg, #b6c9ff, #a87bff, #7aa2ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      max-width: 780px;
+      margin: 0 auto 1.4rem;
+    }
+
+    /* Sections */
+    section {
+      padding: 64px 0;
+    }
+
+    #detections {
+      background: var(--section-bg);
+      border-radius: 20px;
+      padding: 48px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Cosmic Stars Canvas */
+    #stars-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Cosmic Nebula Background */
+    #detections::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(122, 162, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(168, 123, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0, 255, 224, 0.08) 0%, transparent 60%);
+      z-index: 0;
+      animation: nebulaFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes nebulaFloat {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1; /* Keep cards above stars */
+      width: min(1100px, 92%);
+      margin: 0 auto;
+    }
+
+    .h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      margin: 0 0 .6rem;
+      background: linear-gradient(135deg, #ffffff, #b6c9ff, #a87bff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      position: relative;
+    }
+
+    .h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      border-radius: 2px;
+    }
+
+    .muted {
+      color: var(--muted);
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 900px) {
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      display: grid;
+      gap: 20px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2), #00ffe0);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(122,162,255,0.1), rgba(168,123,255,0.05));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border-radius: 24px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow:
+        0 32px 64px rgba(0,0,0,0.4),
+        0 0 40px rgba(122,162,255,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      border-color: var(--brand);
+      background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow:
+        0 8px 24px rgba(122,162,255,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .card-icon::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2), #00ffe0);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .card:hover .card-icon {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow:
+        0 12px 32px rgba(122,162,255,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .card:hover .card-icon::before {
+      opacity: 1;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1));
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+      z-index: 3;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .status-badge {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(34,197,94,0.3);
+    }
+
+    .card h3 {
+      margin: 0;
+    }
+
+    .btn {
+      padding: .85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
+      display: inline-block;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b0f1a;
+      border: none;
+      box-shadow: 0 0 20px rgba(122,162,255,0.4), 0 0 40px rgba(122,162,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .btn.primary:hover {
+      box-shadow: 0 0 30px rgba(122,162,255,0.6), 0 0 60px rgba(122,162,255,0.3);
+      transform: translateY(-2px);
+      color: #0b0f1a;
+      text-decoration: none;
+    }
+
+    /* Cosmic Progress Indicator */
+    .cosmic-progress {
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .cosmic-progress::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--brand), var(--brand-2), transparent);
+      animation: cosmicFlow 3s ease-in-out infinite;
+    }
+
+    @keyframes cosmicFlow {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Enhanced Card Typography */
+    .card h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #b6c9ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .card p.muted {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .media {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #0c1324, #0a111f);
+      min-height: 200px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 4px 16px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .media::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(122,162,255,0.1), rgba(168,123,255,0.05));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+      position: relative;
+      z-index: 0;
+    }
+
+    .card:hover .media {
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.4),
+        0 8px 24px rgba(122,162,255,0.2);
+    }
+
+    .card:hover .media img {
+      transform: scale(1.05);
+    }
+
+    .card:hover .media::before {
+      opacity: 1;
+    }
+
+    /* Button Container */
+    .card > div:last-child {
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    /* Performance Stats */
+    #performance-stats {
+      display:flex;
+      justify-content:center;
+      gap:32px;
+      margin:40px 0;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      padding: 16px 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff;
+      font-weight: 700;
+      min-width: 100px;
+      box-shadow: 0 0 20px rgba(122,162,255,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 40px rgba(122,162,255,0.8);
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: #9bb0d3;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      color: #7aa2ff;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div><span>Cosmic Coders</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home" aria-label="Cosmic Coders Hero">
+    <div class="spline-wrap">
+      <iframe src="https://my.spline.design/galaxy-J5XlxMNlovnVWXLvom9c2sqN/" loading="lazy"
+        title="Cosmic Galaxy"></iframe>
+    </div>
+    <div class="hero-inner">
+      <h1 class="title">We are <span class="grad">Cosmic Coders</span></h1>
+      <p class="sub">AI-powered safety & vision detections. Choose a module below to run a demo.</p>
+      <a class="btn primary" href="#detections">Explore Detections</a>
+    </div>
+  </section>
+
+  <!-- Detections Section -->
+  <section id="detections" aria-label="Detections">
+    <!-- Cosmic Stars Canvas -->
+    <canvas id="stars-canvas"></canvas>
+
+    <div class="wrap">
+      <h2 class="h2">Cosmic Detection Modules</h2>
+      <p class="muted">Explore our AI-powered detection systems. Each module opens in a live detection interface.</p>
+
+      <!-- Cards Row 1 -->
+      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; margin-top: 32px;">
+        <!-- Fire Card -->
+        <div class="card" style="flex: 1 1 300px; max-width: 340px;">
+          <div class="status-badge">Beta</div>
+          <div class="card-header">
+            <div class="card-icon">🔥</div>
+            <h3>Fire / Smoke Detection</h3>
+          </div>
+          <p class="muted">Advanced AI-powered fire and smoke detection with real-time analysis and cosmic-level precision.</p>
+          <div class="cosmic-progress"></div>
+          <div class="media">
+            <img src="{{ url_for('static', filename='images/fire.jpg') }}" alt="Fire Detection Preview" />
+          </div>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;">
+            <a class="btn primary" href="/live/fire">Launch Detection</a>
+          </div>
+        </div>
+
+        <!-- Weapons Card -->
+        <div class="card" style="flex: 1 1 300px; max-width: 340px;">
+          <div class="status-badge">Beta</div>
+          <div class="card-header">
+            <div class="card-icon">🔫</div>
+            <h3>Weapons / Knife Detection</h3>
+          </div>
+          <p class="muted">Cutting-edge weapon detection using cosmic AI algorithms for enhanced security monitoring.</p>
+          <div class="cosmic-progress"></div>
+          <div class="media">
+            <img src="{{ url_for('static', filename='images/weapon.jpg') }}" alt="Weapons Detection Preview" />
+          </div>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;">
+            <a class="btn primary" href="/live/weapons">Launch Detection</a>
+          </div>
+        </div>
+
+        <!-- People Card -->
+        <div class="card" style="flex: 1 1 300px; max-width: 340px;">
+          <div class="status-badge">Beta</div>
+          <div class="card-header">
+            <div class="card-icon">👥</div>
+            <h3>People Detection</h3>
+          </div>
+          <p class="muted">Intelligent human presence detection with cosmic-level accuracy for smart environments.</p>
+          <div class="cosmic-progress"></div>
+          <div class="media">
+            <img src="{{ url_for('static', filename='images/people.jpg') }}" alt="People Detection Preview" />
+          </div>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;">
+            <a class="btn primary" href="/live/people">Launch Detection</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Row 2 -->
+      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; margin-top: 32px;">
+        <!-- Fall Card -->
+        <div class="card" style="flex: 1 1 300px; max-width: 340px;">
+          <div class="status-badge">Beta</div>
+          <div class="card-header">
+            <div class="card-icon">🤕</div>
+            <h3>Fall Detection</h3>
+          </div>
+          <p class="muted">Revolutionary fall detection powered by cosmic AI for instant emergency response.</p>
+          <div class="cosmic-progress"></div>
+          <div class="media">
+            <img src="{{ url_for('static', filename='images/fall.jpg') }}" alt="Fall Detection Preview" />
+          </div>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;">
+            <a class="btn primary" href="/live/fall">Launch Detection</a>
+          </div>
+        </div>
+
+        <!-- Distance Card -->
+        <div class="card" style="flex: 1 1 300px; max-width: 340px;">
+          <div class="status-badge">Beta</div>
+          <div class="card-header">
+            <div class="card-icon">📏</div>
+            <h3>Distance Measurement</h3>
+          </div>
+          <p class="muted">Cosmic-precision distance measurement using advanced computer vision and AI algorithms.</p>
+          <div class="cosmic-progress"></div>
+          <div class="media">
+            <img src="{{ url_for('static', filename='images/Distance.jpg') }}" alt="Distance Measurement Preview" />
+          </div>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;">
+            <a class="btn primary" href="/live/distance">Launch Detection</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Performance Stats Section -->
+<section id="performance" aria-label="Performance Stats">
+  <div class="wrap">
+    <!-- <h2 class="h2">Performance Stats</h2>
+    <p class="muted">Real-time analytics of our AI detection modules.</p> -->
+    <div id="performance-stats">
+      <div class="stat-card">
+        <div class="stat-value" data-target="85.9" data-unit="%">0%</div>
+        <div class="stat-label">Accuracy Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" data-target="60">0</div>
+        <div class="stat-label">FPS Processing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" data-target="500">0</div>
+        <div class="stat-label">Sign Vocabulary</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" data-target="50" data-unit="ms">&lt;0ms</div>
+        <div class="stat-label">Latency</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="wrap" style="display:flex; align-items:center; justify-content:center; gap: 12px; flex-wrap: wrap;">
+      <div>All Rights Reserved © <span id="year"></span> Cosmic Coders</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Animate performance counters
+    const counters = document.querySelectorAll('#performance-stats .stat-value');
+    counters.forEach(counter => {
+      const target = +counter.getAttribute('data-target');
+      let current = 0;
+      const isLatency = counter.innerText.includes('ms');
+      const increment = target / 100;
+
+      const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+          counter.innerText = isLatency ? Math.round(current) + 'ms' : Math.round(current) + (counter.dataset.unit === '%' ? '%' : '');
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.innerText = isLatency ? target + 'ms' : target + (counter.dataset.unit === '%' ? '%' : '');
+        }
+      };
+      updateCounter();
+    });
+
+    // Enhanced Cosmic stars effect
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+    const stars = [];
+    const numStars = 200;
+    const shootingStars = [];
+    let mouseX = 0, mouseY = 0;
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    class Star {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = random(0, w);
+        this.y = random(0, h);
+        this.radius = random(0.5, 3);
+        this.alpha = random(0.2, 1);
+        this.dx = random(-0.02, 0.02);
+        this.dy = random(-0.02, 0.02);
+        this.dAlpha = random(0.001, 0.008);
+        this.twinkleSpeed = random(0.01, 0.03);
+        this.baseAlpha = this.alpha;
+      }
+      draw() {
+        // Create twinkling effect
+        const twinkle = Math.sin(Date.now() * this.twinkleSpeed) * 0.3;
+        const currentAlpha = Math.max(0.1, this.baseAlpha + twinkle);
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+        // Add cosmic glow effect
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 3);
+        gradient.addColorStop(0, `rgba(122,162,255,${currentAlpha})`);
+        gradient.addColorStop(0.5, `rgba(168,123,255,${currentAlpha * 0.5})`);
+        gradient.addColorStop(1, `rgba(255,255,255,0)`);
+
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Add bright center
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${currentAlpha})`;
+        ctx.fill();
+      }
+      update() {
+        this.x += this.dx;
+        this.y += this.dy;
+        this.alpha += this.dAlpha;
+        if (this.alpha > 1 || this.alpha < 0.2) this.dAlpha = -this.dAlpha;
+        if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset();
+        this.draw();
+      }
+    }
+
+    class ShootingStar {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = random(-100, w + 100);
+        this.y = random(-100, h + 100);
+        this.vx = random(2, 5);
+        this.vy = random(2, 5);
+        this.life = 1;
+        this.decay = random(0.01, 0.02);
+        this.length = random(20, 40);
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.life;
+
+        // Draw shooting star trail
+        const gradient = ctx.createLinearGradient(this.x, this.y, this.x - this.vx * this.length, this.y - this.vy * this.length);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(0.5, 'rgba(122,162,255,0.8)');
+        gradient.addColorStop(1, 'rgba(122,162,255,0)');
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - this.vx * this.length, this.y - this.vy * this.length);
+        ctx.stroke();
+
+        // Draw bright head
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,1)';
+        ctx.fill();
+
+        ctx.restore();
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= this.decay;
+
+        if (this.life <= 0 || this.x > w + 100 || this.y > h + 100) {
+          this.reset();
+        }
+        this.draw();
+      }
+    }
+
+    // Initialize stars and shooting stars
+    for (let i = 0; i < numStars; i++) stars.push(new Star());
+    for (let i = 0; i < 3; i++) shootingStars.push(new ShootingStar());
+
+    function animateStars() {
+      ctx.clearRect(0, 0, w, h);
+
+      // Update and draw stars
+      stars.forEach(s => s.update());
+
+      // Update and draw shooting stars
+      shootingStars.forEach(s => s.update());
+
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    // Mouse interaction for cosmic effects
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    window.addEventListener('resize', () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+
+</html>
